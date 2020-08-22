@@ -99,8 +99,8 @@ static const uint8_t oled_init_data[] = {
     SSD1306_SETCOMPINS, 0x12,       // set divide ratio
     SSD1306_SETVCOMDETECT, 0x20,    // vcom deselect to 0x20 // 0x40
     SSD1306_CHARGEPUMP, SSD1306VAL_CHARGEPUMP_ON,       // Enable charge pump
-    //SSD1306_HVA_SETPAGE, 0x00, 0x07,
-    //SSD1306_HVA_SETCOL, 0x00, 0x7F,
+    SSD1306_HVA_SETPAGE, 0x00, 0x07,
+    SSD1306_HVA_SETCOL, 0x00, 0x7F,
     SSD1306_DISPLAYALLON_RESUME,
     SSD1306_DISPLAYON,
 };
@@ -110,6 +110,7 @@ class RixOled
 public:
     
     void init(void);
+    void setDisplayOn(bool on);
     void setNormalDisplay(void);
     void setInverseDisplay(void);
     void setAddrModeHorizontal(void);
@@ -123,7 +124,8 @@ public:
     
     void clear(void);
     void test(uint8_t p, uint8_t c);
-    void blit(uint8_t size);
+    void blit(uint8_t *data, uint8_t size);
+    void blit(uint8_t data);
     
 private:
     void writeCommandByte(uint8_t command);
