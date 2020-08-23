@@ -13,6 +13,15 @@
 
 #define SSD1306_IICADDR         0x3C
 
+#ifndef __AVR__
+#define DATAMEM
+#endif
+#ifdef __AVR__
+#define DATAMEM PROGMEM
+#endif
+
+#define MAXROW	4
+#define MAXCOL  8
 
 /** Set Lower Column Start Address for Page Addressing Mode. */
 #define SSD1306_SETLOWCOLUMN        0x00
@@ -82,8 +91,12 @@
 
 #define SSD1306_PA_SETPAGE          0xB0
 
+static const DATAMEM uint8_t glyph_data[][16] = {
+  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+};
 
-static const PROGMEM uint8_t oled_init_data[] = {
+static const DATAMEM uint8_t oled_init_data[] = {
     SSD1306_DISPLAYOFF,
     SSD1306_SETCONTRAST, SSD1306VAL_CONTRAST,      // contrast value to 0x7F according to datasheet
     SSD1306_NORMALDISPLAY,
@@ -122,22 +135,30 @@ public:
     void setPage(uint8_t p1);
     void setColRange(uint8_t c1, uint8_t c2);
     void setCol(uint8_t c1);
+
+    void moveTo(uint8_t row, uint8_t col);
     
     void clear(void);
     void test(uint8_t p, uint8_t c);
     void blit(uint8_t *data, uint8_t size);
     void blit(uint8_t data);
-    
+    void blitGlyph(uint8_t glyph);
+
 private:
     void writeCommandByte(uint8_t command);
     void writeDataByte(uint8_t data);
     
     void _update_mode(void);
+    void _blitGlyphUpper(uint8_t glyph);
+    void _blitGlyphLower(uint8_t glyph);
 
     uint8_t addr_mode;
+    uint8_t row_c;
+    uint8_t col_c;
 };
 
 extern RixOled rixoled;
+
 
 
 #endif
