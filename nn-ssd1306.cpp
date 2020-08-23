@@ -3,6 +3,7 @@
 
 #include "nn-ssd1306.h"
 
+#ifndef __AVR__
 void RixOled::init() {
     const uint8_t* inittab = oled_init_data;
     for(uint8_t i=0; i<sizeof(oled_init_data); i++) {
@@ -10,12 +11,23 @@ void RixOled::init() {
     }
     this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
 }
+#endif
+
+#ifdef __AVR__
+void RixOled::init() {
+    const uint8_t* inittab = oled_init_data;
+    for(uint8_t i=0; i<init_data_len; i++) {
+        writeCommandByte(pgm_read_byte(inittab[i]));
+    }
+    this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
+}
+#endif
 
 void RixOled::setDisplayOn(bool on) {
     if(on) {
-        writeCommandByte(SSD1306_DISPLAYOFF);
+        writeCommandByte(SSD1306_DISPLAYON);
     } else {
-        writeCommandByte(SSD1306_DISPLAYON);        
+        writeCommandByte(SSD1306_DISPLAYOFF);        
     }
 }
 
@@ -80,21 +92,22 @@ void RixOled::writeCommandByte(uint8_t command) {
 
 void RixOled::clear() {
     unsigned char i,j;
-    setDisplayOn(FALSE);
+    setDisplayOn(false);
     setColRange(0,127);
     setPageRange(0,7);
     setCol(0);
     for(j=0; j<8; j++) {
         setPage(j);
         //writeCommandByte(SSD1306_SETSTARTLINE | j);
-        Wire.beginTransmission(SSD1306_IICADDR);
-        Wire.write(0x40);
+        //Wire.beginTransmission(SSD1306_IICADDR);
+        //Wire.write(0x40);
         for(i=0; i<128; i++) {
-            Wire.write(0x00);
+            //Wire.write(0x00);
+            writeDataByte(0x00);
         }
-        Wire.endTransmission();
+        //Wire.endTransmission();
     }
-    setDisplayOn(TRUE);
+    setDisplayOn(true);
 }
 
 void RixOled::_update_mode() {
@@ -105,7 +118,7 @@ void RixOled::_update_mode() {
 void RixOled::blit(uint8_t *data, uint8_t size) {
     unsigned char i;
     Wire.beginTransmission(SSD1306_IICADDR);
-    for(i=0;i<size;i++) Wire.write(data);
+    for(i=0;i<size;i++) Wire.write(data[i]);
     Wire.endTransmission();
 }
 

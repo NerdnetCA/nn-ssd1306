@@ -83,7 +83,7 @@
 #define SSD1306_PA_SETPAGE          0xB0
 
 
-static const uint8_t oled_init_data[] = {
+static const PROGMEM uint8_t oled_init_data[] = {
     SSD1306_DISPLAYOFF,
     SSD1306_SETCONTRAST, SSD1306VAL_CONTRAST,      // contrast value to 0x7F according to datasheet
     SSD1306_NORMALDISPLAY,
@@ -104,6 +104,7 @@ static const uint8_t oled_init_data[] = {
     SSD1306_DISPLAYALLON_RESUME,
     SSD1306_DISPLAYON,
 };
+static const int init_data_len = sizeof(oled_init_data);
 
 class RixOled
 {
