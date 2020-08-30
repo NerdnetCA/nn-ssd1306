@@ -20,8 +20,10 @@
 #define DATAMEM PROGMEM
 #endif
 
+#include "hackfont.h"
+
 #define MAXROW	4
-#define MAXCOL  8
+#define MAXCOL  12
 
 /** Set Lower Column Start Address for Page Addressing Mode. */
 #define SSD1306_SETLOWCOLUMN        0x00
@@ -91,10 +93,6 @@
 
 #define SSD1306_PA_SETPAGE          0xB0
 
-static const DATAMEM uint8_t glyph_data[][16] = {
-  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-};
 
 static const DATAMEM uint8_t oled_init_data[] = {
     SSD1306_DISPLAYOFF,
@@ -143,14 +141,13 @@ public:
     void blit(uint8_t *data, uint8_t size);
     void blit(uint8_t data);
     void blitGlyph(uint8_t glyph);
+    void blitString(char *s);
 
 private:
     void writeCommandByte(uint8_t command);
     void writeDataByte(uint8_t data);
     
     void _update_mode(void);
-    void _blitGlyphUpper(uint8_t glyph);
-    void _blitGlyphLower(uint8_t glyph);
 
     uint8_t addr_mode;
     uint8_t row_c;

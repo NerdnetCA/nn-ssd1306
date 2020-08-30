@@ -120,28 +120,32 @@ void RixOled::moveTo(uint8_t row, uint8_t col) {
 }
 
 void RixOled::blitGlyph(uint8_t glyph) {
-    uint8_t row, col;
+    uint8_t row, col, i;
     row = this->row_c*2;
-    col = this->col_c*16;
+    col = this->col_c*10;
+    const uint8_t *fdat;
+
+    setPageRange(row, row+1);
+    setColRange(col, col+GLYPHWIDTH);
     setPage(row);
     setCol(col);
-    _blitGlyphUpper(glyph);
-    setPage(row+1);
-    setCol(col);
-    _blitGlyphLower(glyph);
-}
-
-void RixOled::_blitGlyphUpper(uint8_t glyph) {
-    uint8_t i;
-    for(i=0;i<16;i++) {
-        blit(pgm_read_byte(&glyph_data[0][i]));
+    fdat = font_data[glyph];
+    for(i=0; i<20; i++) {
+        blit(pgm_read_byte(fdat++));
     }
+    //_blitGlyphUpper(glyph);
+    //setPage(row+1);
+    //setCol(col);
+    //_blitGlyphLower(glyph);
 }
 
-void RixOled::_blitGlyphLower(uint8_t glyph) {
-    uint8_t i;
-    for(i=0;i<16;i++) {
-        blit(pgm_read_byte(&glyph_data[1][i]));
+void RixOled::blitString(char * s) {
+    uint8_t i = 0;
+    while(*s != '\0' && i<MAXCOL) {
+        blitGlyph(*s++);
+        i++;
+        if(this->col_c < MAXCOL)
+            this->col_c++;
     }
 }
 
