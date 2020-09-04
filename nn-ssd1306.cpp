@@ -10,6 +10,7 @@ void RixOled::init() {
         writeCommandByte(inittab[i]);
     }
     this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
+    setAddrModeVertical();
 }
 #endif
 
@@ -20,6 +21,7 @@ void RixOled::init() {
         writeCommandByte(pgm_read_byte(&inittab[i]));
     }
     this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
+    setAddrModeVertical();
 }
 #endif
 
@@ -95,17 +97,10 @@ void RixOled::clear() {
     setDisplayOn(false);
     setColRange(0,127);
     setPageRange(0,7);
-    //setCol(0);
     for(j=0; j<8; j++) {
-        //setPage(j);
-        //writeCommandByte(SSD1306_SETSTARTLINE | j);
-        //Wire.beginTransmission(SSD1306_IICADDR);
-        //Wire.write(0xC0);
         for(i=0; i<128; i++) {
-            //Wire.write(0x00);
             writeDataByte(0x00);
         }
-        //Wire.endTransmission();
     }
     setDisplayOn(true);
 }
@@ -131,12 +126,13 @@ void RixOled::blitGlyph(uint8_t glyph) {
     setCol(col);
     fdat = font_data[glyph];
     for(i=0; i<20; i++) {
+#ifdef __AVR__
         blit(pgm_read_byte(fdat++));
+#endif
+#ifndef __AVR__
+        blit(fdat++);
+#endif
     }
-    //_blitGlyphUpper(glyph);
-    //setPage(row+1);
-    //setCol(col);
-    //_blitGlyphLower(glyph);
 }
 
 void RixOled::blitString(char * s) {
@@ -154,27 +150,8 @@ void RixOled::_update_mode() {
     writeCommandByte(this->addr_mode);
 }
 
-void RixOled::blit(uint8_t *data, uint8_t size) {
-    unsigned char i;
-    Wire.beginTransmission(SSD1306_IICADDR);
-    for(i=0;i<size;i++) Wire.write(data[i]);
-    Wire.endTransmission();
-}
-
 void RixOled::blit(uint8_t data) {
     writeDataByte(data);
-}
-
-void RixOled::test(uint8_t p, uint8_t c) {
-    unsigned char i;
-    setPageRange(p,p);
-    setPage(p);
-    if(c>120) c=120;
-    setColRange(c,c+7);
-    setCol(c);
-    for(i=0; i<8; i++) {
-        writeDataByte(0xFF);
-    }
 }
 
 RixOled rixoled;

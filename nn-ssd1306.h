@@ -137,8 +137,6 @@ public:
     void moveTo(uint8_t row, uint8_t col);
     
     void clear(void);
-    void test(uint8_t p, uint8_t c);
-    void blit(uint8_t *data, uint8_t size);
     void blit(uint8_t data);
     void blitGlyph(uint8_t glyph);
     void blitString(char *s);
