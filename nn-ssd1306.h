@@ -99,14 +99,14 @@ static const DATAMEM uint8_t oled_init_data[] = {
     SSD1306_SETCONTRAST, SSD1306VAL_CONTRAST,      // contrast value to 0x7F according to datasheet
     SSD1306_NORMALDISPLAY,
     SSD1306_DEACTIVATE_SCROLL,
-    SSD1306_MEMORYMODE, SSD1306VAL_HORIZONTAL_ADDR,
-    SSD1306_COMSCANDEC,             // Scan from 127 to 0 (Reverse scan)
+    SSD1306_MEMORYMODE, SSD1306VAL_VERTICAL_ADDR,
     SSD1306_SETSTARTLINE | 0x00,    // First line to start scanning from
+    SSD1306_COMSCANDEC,             // Scan from 127 to 0 (Reverse scan)
     SSD1306_SEGREMAP,               // Use reverse mapping. 0x00 - is normal mapping
     SSD1306_SETMULTIPLEX, SSD1306VAL_64LINE,
     SSD1306_SETDISPLAYOFFSET, 0x00, // no offset
-    SSD1306_SETDISPLAYCLOCKDIV, SSD1306VAL_CLOCKDIV,  // set to default ratio/osc frequency
-    SSD1306_SETPRECHARGE, 0x22,     // switch precharge to 0x22 // 0xF1
+    SSD1306_SETDISPLAYCLOCKDIV, SSD1306VAL_CLOCKDIV,  // ratio/osc frequency
+    SSD1306_SETPRECHARGE, 0x22,     // 0x22 for charge pump mode, 0xF1 for external vcc
     SSD1306_SETCOMPINS, 0x12,       // set divide ratio
     SSD1306_SETVCOMDETECT, 0x20,    // vcom deselect to 0x20 // 0x40
     SSD1306_CHARGEPUMP, SSD1306VAL_CHARGEPUMP_ON,       // Enable charge pump

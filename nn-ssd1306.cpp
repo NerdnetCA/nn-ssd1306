@@ -9,8 +9,7 @@ void RixOled::init() {
     for(uint8_t i=0; i<sizeof(oled_init_data); i++) {
         writeCommandByte(inittab[i]);
     }
-    this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
-    setAddrModeVertical();
+    this->addr_mode = SSD1306VAL_VERTICAL_ADDR;
 }
 #endif
 
@@ -20,8 +19,7 @@ void RixOled::init() {
     for(uint8_t i=0; i<init_data_len; i++) {
         writeCommandByte(pgm_read_byte(&inittab[i]));
     }
-    this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
-    setAddrModeVertical();
+    this->addr_mode = SSD1306VAL_VERTICAL_ADDR;
 }
 #endif
 

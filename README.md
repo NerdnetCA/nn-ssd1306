@@ -2,10 +2,9 @@
 
 Purpose:
 
-Arduino driver library for SSD1306 .96" OLED display.
+Minimalist Arduino driver library for SSD1306 .96" OLED display.
 
 Status:
 
-No.
+Meh. Works for me.
 
-Also, currently only for SAMD core.
