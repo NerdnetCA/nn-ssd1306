@@ -1,3 +1,14 @@
+/** hackfont.h
+ * by NerdnetCA
+ * 
+ * 16 pixel font for ssd1306.
+ * This was made by rendering Hack into 127 small bitmaps.
+ * The bitmaps are oriented for convenience in rendering to the
+ * vertically-oriented bytes of the display.
+ * 
+ * There is a lot of free space in the low bytes for custom glyphs.
+ * 
+ */
 
 #ifndef HACKFONT_H
 #define HACKFONT_H
