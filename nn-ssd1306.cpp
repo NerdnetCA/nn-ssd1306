@@ -211,7 +211,7 @@ void RixOled::blitGlyph(uint8_t glyph) {
         blit(pgm_read_byte(fdat++));
 #endif
 #ifndef __AVR__
-        blit(fdat++);
+        blit(*fdat++);
 #endif
     }
 }
