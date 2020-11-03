@@ -98,41 +98,55 @@
 static const DATAMEM uint8_t oled_init_data[] = {
     // Step one, turn display off, so we don't see "fireworks" during init
     SSD1306_DISPLAYOFF,
+    
     // Set contrast to 0x7F - apparently this is the datasheet-recommended value.
     SSD1306_SETCONTRAST, SSD1306VAL_CONTRAST,
+    
     // Normal display, not inversed.
     SSD1306_NORMALDISPLAY,
+    
     // Make sure scrolling is off.
     SSD1306_DEACTIVATE_SCROLL,
+    
     // Because of how I've constructed my font data, I use vertical mode
     SSD1306_MEMORYMODE, SSD1306VAL_VERTICAL_ADDR,
+    
     // Set start line to zero - update this value for vertical scrolling
     SSD1306_SETSTARTLINE | 0x00,
+    
     // "reverse scan" and "segremap" allow flipping the display orientation.
     SSD1306_COMSCANDEC,
     SSD1306_SEGREMAP,
-    // 128x64 pixel display - 64 lines.
+    
+    // 128x64 pixel display - 64 lines.  **NOTE** Change to SSD1306VAL_32LINE for 128x32 display.
     SSD1306_SETMULTIPLEX, SSD1306VAL_64LINE,
+    
     // I don't know what this does.
     SSD1306_SETDISPLAYOFFSET, 0x00,
+    
     // Apparently datasheet recommended. I don't know if a 32-line display needs a 
     // different setting.
     SSD1306_SETDISPLAYCLOCKDIV, SSD1306VAL_CLOCKDIV,
+    
     // Always set to 0x22 for the I2C-based units.
     // 0xF1 is the other option, if a high-volts external vcc pin is present  ?
     // The alternative is charge pump mode.
     SSD1306_SETPRECHARGE, 0x22,
     SSD1306_CHARGEPUMP, SSD1306VAL_CHARGEPUMP_ON,
+    
     // Only works with 0x12, dunno anything about this setting.
     SSD1306_SETCOMPINS, 0x12,       // set divide ratio
+    
     // Only works with 0x20. Again, I dunno.
     SSD1306_SETVCOMDETECT, 0x20,
+    
     // Set page and column ranges to full display.
-    // Setting to reduced range clips rendering, but seemingly NOT reliably.
     SSD1306_HVA_SETPAGE, 0x00, 0x07,
     SSD1306_HVA_SETCOL, 0x00, 0x7F,
+    
     // ALLON_RESUME is necessary, again for unknown reason.
     SSD1306_DISPLAYALLON_RESUME,
+    
     // And finally, turn the display back on.
     SSD1306_DISPLAYON,
 };

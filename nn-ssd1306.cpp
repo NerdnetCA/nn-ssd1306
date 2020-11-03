@@ -3,7 +3,8 @@
  * by NerdnetCA
  * 
  * Minimalist ssd1306 OLED driver library for Arduino.
- * 128x64 only.
+ * Designed 128x64 model only!!  See .h file for information
+ * on adapting to 128x32 model.
  * 
  * 
  */
@@ -13,6 +14,9 @@
 /** Initialize display, SAMD version.
  * For achitectures able to address program memory directly,
  * such as SAMD21
+ * 
+ * NOTE: This probably isn't robust. I have only AVR and SAMD devices
+ * for testing. Use of this code on any other hardware may summon the Devil.
  * 
  */
 #ifndef __AVR__
@@ -192,8 +196,8 @@ void RixOled::blit(uint8_t data) {
  * at the character position established by moveTo().
  * 
  * I use blit() to achieve this, which writes one data byte at a time.
- * This isn't efficient, but writing multiple bytes only seems to 
- * work on some controllrs.
+ * This isn't efficient, but writing multiple bytes seems to break
+ * on some controllers
  */
 void RixOled::blitGlyph(uint8_t glyph) {
     uint8_t row, col, i;
