@@ -2,8 +2,12 @@
 
 Arduino driver library for SSD1306 .96" OLED display.
 
-This is intended as a reference and testing implementation. The code is not dense, so don't
-be afraid to read it and adapt it to your needs.
+This is intended as a reference and testing implementation, NOT for production use.
+In other words, you're meant to use this code to help get to an understanding of how the
+SSD1306 device works, and how you can implement driver code 
+that is specific to YOUR production requirement.
+
+The code is not dense, and it's Creative Commons licensed.
 
 Usage:
 
@@ -17,7 +21,8 @@ void setup() {
     
     rixoled.clear();
     rixoled.moveTo(0,0);
-    rixoled.blitString("Hello,");
+    rixoled.blitString("Hello,"); // to blit is to copy a block of data, typically
+                                  // from main memory to video memory
     rixoled.moveTo(1,0);
     rixoled.blitString("World");
 }
