@@ -8,7 +8,7 @@
 #ifndef NNSSD1306
 #define NNSSD1306
 
-#include "Arduino.h"
+//#include "Arduino.h"
 #include <Wire.h>
 
 #define SSD1306_IICADDR         0x3C
@@ -22,8 +22,9 @@
 
 #include "hackfont.h"
 
-#define MAXROW	4
 #define MAXCOL  12
+#define SSDLINES_64     0x01
+#define SSDLINES_32     0x02
 
 /** Set Lower Column Start Address for Page Addressing Mode. */
 #define SSD1306_SETLOWCOLUMN        0x00
@@ -135,7 +136,7 @@ static const DATAMEM uint8_t oled_init_data[] = {
     SSD1306_CHARGEPUMP, SSD1306VAL_CHARGEPUMP_ON,
     
     // Only works with 0x12, dunno anything about this setting.
-    SSD1306_SETCOMPINS, 0x12,       // set divide ratio
+    SSD1306_SETCOMPINS, 0x12,     
     
     // Only works with 0x20. Again, I dunno.
     SSD1306_SETVCOMDETECT, 0x20,
@@ -150,12 +151,36 @@ static const DATAMEM uint8_t oled_init_data[] = {
     // And finally, turn the display back on.
     SSD1306_DISPLAYON,
 };
+
+// 32-line version of above
+static const DATAMEM uint8_t oled_init_data32[] = {
+    SSD1306_DISPLAYOFF,
+    SSD1306_SETCONTRAST, SSD1306VAL_CONTRAST,
+    SSD1306_NORMALDISPLAY,
+    SSD1306_DEACTIVATE_SCROLL,
+    SSD1306_MEMORYMODE, SSD1306VAL_VERTICAL_ADDR,
+    SSD1306_SETSTARTLINE | 0x00,
+    SSD1306_COMSCANDEC,
+    SSD1306_SEGREMAP,
+    SSD1306_SETMULTIPLEX, SSD1306VAL_32LINE,  // 128x32
+    SSD1306_SETDISPLAYOFFSET, 0x00,
+    SSD1306_SETDISPLAYCLOCKDIV, SSD1306VAL_CLOCKDIV,
+    SSD1306_SETPRECHARGE, 0x22,
+    SSD1306_CHARGEPUMP, SSD1306VAL_CHARGEPUMP_ON,
+    SSD1306_SETCOMPINS, 0x02,                 // 128x32
+    SSD1306_SETVCOMDETECT, 0x20,
+    SSD1306_HVA_SETPAGE, 0x00, 0x07,
+    SSD1306_HVA_SETCOL, 0x00, 0x7F,
+    SSD1306_DISPLAYALLON_RESUME,
+    SSD1306_DISPLAYON,
+};
+
 static const int init_data_len = sizeof(oled_init_data);
 
-class RixOled
+class SSD_IIC
 {
 public:
-    void init(void);
+    void init(int mode);
     void setDisplayOn(bool on);
     void setNormalDisplay(void);
     void setInverseDisplay(void);
@@ -181,13 +206,11 @@ private:
     
     void _update_mode(void);
 
+    uint8_t maxrows;
     uint8_t addr_mode;
     uint8_t row_c;
     uint8_t col_c;
 };
 
-extern RixOled rixoled;
-
-
-
 #endif
+

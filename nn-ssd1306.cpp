@@ -20,8 +20,15 @@
  * 
  */
 #ifndef __AVR__
-void RixOled::init() {
-    const uint8_t* inittab = oled_init_data;
+void SSD_IIC::init(int mode) {
+    const uint8_t* inittab;
+    if(mode==SSDLINES_64) {
+        inittab = oled_init_data;
+        maxrows = 4;
+    } else {
+        inittab = oled_init_data32;
+        maxrows = 2;
+    }
     for(uint8_t i=0; i<sizeof(oled_init_data); i++) {
         writeCommandByte(inittab[i]);
     }
@@ -35,8 +42,15 @@ void RixOled::init() {
  *
  */
 #ifdef __AVR__
-void RixOled::init() {
-    const uint8_t* inittab = oled_init_data;
+void SSD_IIC::init(int mode) {
+    const uint8_t* inittab;
+    if(mode==SSDLINES_64) {
+        inittab = oled_init_data;
+        maxrows = 4;
+    } else {
+        inittab = oled_init_data32;
+        maxrows = 2;
+    }
     for(uint8_t i=0; i<init_data_len; i++) {
         writeCommandByte(pgm_read_byte(&inittab[i]));
     }
@@ -47,7 +61,7 @@ void RixOled::init() {
 
 /** Turn display on (or off)
  */
-void RixOled::setDisplayOn(bool on) {
+void SSD_IIC::setDisplayOn(bool on) {
     if(on) {
         writeCommandByte(SSD1306_DISPLAYON);
     } else {
@@ -58,13 +72,13 @@ void RixOled::setDisplayOn(bool on) {
 /** Set to normal display mode.
  * 
  */
-void RixOled::setNormalDisplay() {
+void SSD_IIC::setNormalDisplay() {
     writeCommandByte(SSD1306_NORMALDISPLAY);
 }
 
 /** Set inverse display. (reverse pixel values)
  */
-void RixOled::setInverseDisplay() {
+void SSD_IIC::setInverseDisplay() {
     writeCommandByte(SSD1306_INVERTDISPLAY);
 }
 
@@ -72,7 +86,7 @@ void RixOled::setInverseDisplay() {
  * display in a left to right fashion, advancing the page (row)
  * after the end of row is passed.
  */
-void RixOled::setAddrModeHorizontal() {
+void SSD_IIC::setAddrModeHorizontal() {
     this->addr_mode = SSD1306VAL_HORIZONTAL_ADDR;
     _update_mode();
 }
@@ -82,7 +96,7 @@ void RixOled::setAddrModeHorizontal() {
  * last row is written.  This is a convenient mode for
  * rendering the 16 pixel high font.
  */
-void RixOled::setAddrModeVertical() {
+void SSD_IIC::setAddrModeVertical() {
     this->addr_mode = SSD1306VAL_VERTICAL_ADDR;
     _update_mode();
 }
@@ -90,7 +104,7 @@ void RixOled::setAddrModeVertical() {
 /** Paged addressing mode is like Horizontal, but doesn't
  * advance the page.
  */
-void RixOled::setAddrModePage() {
+void SSD_IIC::setAddrModePage() {
     this->addr_mode = SSD1306VAL_PAGE_ADDR;
     _update_mode();
 }
@@ -100,7 +114,7 @@ void RixOled::setAddrModePage() {
  * the ability to write 20 consecutive bytes of character
  * bitmap without having to update "cursor" position.
  */
-void RixOled::setPageRange(uint8_t p1, uint8_t p2) {
+void SSD_IIC::setPageRange(uint8_t p1, uint8_t p2) {
     writeCommandByte(0x22);
     writeCommandByte(p1);
     writeCommandByte(p2);
@@ -111,13 +125,13 @@ void RixOled::setPageRange(uint8_t p1, uint8_t p2) {
  * weirdly with other modes.  I don't fully understand
  * how this works.
  */
-void RixOled::setPage(uint8_t p1) {
+void SSD_IIC::setPage(uint8_t p1) {
     writeCommandByte(SSD1306_PA_SETPAGE | (p1 & 0x07));
 }
 
 /** Restrict column rendering range. Similar to page range.
  */
-void RixOled::setColRange(uint8_t c1, uint8_t c2) {
+void SSD_IIC::setColRange(uint8_t c1, uint8_t c2) {
     writeCommandByte(0x21);
     writeCommandByte(c1);
     writeCommandByte(c2);
@@ -126,7 +140,7 @@ void RixOled::setColRange(uint8_t c1, uint8_t c2) {
 /** Set column - again this appears to be for paged addressing
  * mode, but it isn't fully clear how this affects other modes.
  */
-void RixOled::setCol(uint8_t c1) {
+void SSD_IIC::setCol(uint8_t c1) {
     c1 = c1&0x7F;
     writeCommandByte(c1 & 0x0F);
     writeCommandByte(((c1>>4)&0x0F) | 0x10);
@@ -136,7 +150,7 @@ void RixOled::setCol(uint8_t c1) {
  * 8 pixels of one column, in one page. LSB at top.
  * For internal use.
  */
-void RixOled::writeDataByte(uint8_t data) {
+void SSD_IIC::writeDataByte(uint8_t data) {
     Wire.beginTransmission(SSD1306_IICADDR);
     Wire.write(0xC0);
     Wire.write(data);
@@ -145,7 +159,7 @@ void RixOled::writeDataByte(uint8_t data) {
 
 /** Write one command byte to the display. For internal use.
  */
-void RixOled::writeCommandByte(uint8_t command) {
+void SSD_IIC::writeCommandByte(uint8_t command) {
     Wire.beginTransmission(SSD1306_IICADDR);
     Wire.write(0x80);
     Wire.write(command);
@@ -156,12 +170,14 @@ void RixOled::writeCommandByte(uint8_t command) {
  * and column ranges, but makes no contract for the final
  * cursor position.
  */
-void RixOled::clear() {
+void SSD_IIC::clear() {
     unsigned char i,j;
+    int lim = maxrows*2;
     setDisplayOn(false);
     setColRange(0,127);
-    setPageRange(0,7);
-    for(j=0; j<8; j++) {
+    setPageRange(0,(maxrows*2)-1);
+    
+    for(j=0; j<lim; j++) {
         for(i=0; i<128; i++) {
             writeDataByte(0x00);
         }
@@ -176,10 +192,10 @@ void RixOled::clear() {
  * display without updating via moveTo, your text will
  * overwrite previous position.
  */
-void RixOled::moveTo(uint8_t row, uint8_t col) {
+void SSD_IIC::moveTo(uint8_t row, uint8_t col) {
     if(row < 0) row=0;
     if(col < 0) col=0;
-    if(row >= MAXROW) row=MAXROW-1;
+    if(row >= maxrows) row=maxrows-1;
     if(col >= MAXCOL) col=MAXCOL-1;
     this->col_c = col;
     this->row_c = row;
@@ -187,7 +203,7 @@ void RixOled::moveTo(uint8_t row, uint8_t col) {
 
 /** Blindly write one byte to the display.
  */
-void RixOled::blit(uint8_t data) {
+void SSD_IIC::blit(uint8_t data) {
     writeDataByte(data);
 }
 
@@ -199,7 +215,7 @@ void RixOled::blit(uint8_t data) {
  * This isn't efficient, but writing multiple bytes seems to break
  * on some controllers
  */
-void RixOled::blitGlyph(uint8_t glyph) {
+void SSD_IIC::blitGlyph(uint8_t glyph) {
     uint8_t row, col, i;
     row = this->row_c*2;
     col = this->col_c*10;
@@ -223,7 +239,7 @@ void RixOled::blitGlyph(uint8_t glyph) {
 /** Blit (copy) an entire string (12 chars max)
  * to the display, at the character position.
  */
-void RixOled::blitString(char * s) {
+void SSD_IIC::blitString(char * s) {
     uint8_t i = 0;
     while(*s != '\0' && i<MAXCOL) {
         blitGlyph(*s++);
@@ -234,10 +250,8 @@ void RixOled::blitString(char * s) {
 }
 
 // Internal.
-void RixOled::_update_mode() {
+void SSD_IIC::_update_mode() {
     writeCommandByte(SSD1306_MEMORYMODE);
     writeCommandByte(this->addr_mode);
 }
 
-
-RixOled rixoled;

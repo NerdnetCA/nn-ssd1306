@@ -19,7 +19,7 @@ void setup() {
   // Out-of-box, the screen should light up with random bits at this point, but
   // not if it is still holding a cleared buffer internally - which it seems
   // to be able to do for hours.
-  rixoled.init();
+  rixoled.init(SSDLINES_64);
 
   // Wait a second before clearing screen, so we can see the noise, if any.
   delay(1000);
